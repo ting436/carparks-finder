@@ -5,6 +5,7 @@ import {
   Marker,
   useMap,
   ZoomControl,
+  Popup,
 } from "react-leaflet";
 import { Icon, LatLngLiteral } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -13,7 +14,17 @@ import "leaflet-defaulticon-compatibility";
 
 type MapType = "roadmap" | "satellite" | "hybrid" | "terrain";
 
-type MapLocation = LatLngLiteral & { id: string };
+type CarparkInfo = {
+  lot_type: string;
+  lots_available: number;
+};
+
+type CarparkData = {
+carpark_number: string;
+carpark_info: CarparkInfo[];
+};
+
+type MapLocation = LatLngLiteral & { id: string, carparkData: CarparkData };
 
 type MapProps = {
   center: LatLngLiteral;
@@ -53,6 +64,7 @@ export const Map: React.FC<MapProps> = memo(({ center, locations }) => {
 
   const renderMarks = () => {
     return locations.map((location) => (
+      
       <div key={location.id}>
         <Marker
           icon={
@@ -66,7 +78,20 @@ export const Map: React.FC<MapProps> = memo(({ center, locations }) => {
               setSelectedLocation(location);
             },
           }}
-        />
+        >
+          <Popup>
+            <div>
+              <h3>Carpark Number: {location.carparkData.carpark_number}</h3>
+              <ul>
+                {location.carparkData.carpark_info.map((info, index) => (
+                  <li key={index}>
+                    Lot Type: {info.lot_type}, Lots Available: {info.lots_available}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Popup>
+        </Marker>
       </div>
     ));
   };
