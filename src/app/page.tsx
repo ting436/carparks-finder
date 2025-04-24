@@ -40,10 +40,11 @@ export default function Page() {
   const [locations, setLocations] = useState<
     { id: string; lat: number; lng: number; carparkData: CarparkData }[]
   >([]);
+  const [location, setLocation] = useState<{lat: number; lng: number} | null>(null);
 
   async function fetchCarparkData(datetime: string) {
     const response = await fetch(
-      `https://api.data.gov.sg/v1/transport/carpark-availability/?date_time=2025-04-24T12:15:55.083Z`,
+      `https://api.data.gov.sg/v1/transport/carpark-availability/?date_time=${datetime}`,
       {
         method: "GET",
         headers: {
@@ -60,6 +61,31 @@ export default function Page() {
     const posts = await response.json();
     const data = posts.items[0]?.carpark_data || [];
     return data;
+  }
+
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(success, error);
+    } else { 
+      return null;
+    }
+  }
+  
+  function success(position: GeolocationPosition) {
+    const currentLocation = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+    }
+    setLocation(currentLocation);
+    return currentLocation;
+  }
+
+  useEffect(() => {
+      getLocation();
+    }, []);
+  
+  function error() {
+    alert("Sorry, no position available.");
   }
 
   async function fetchAllCarparkInfo() {
@@ -134,8 +160,9 @@ export default function Page() {
           height: "100vh",
         }}
       >
-        <Map center={{ lat: 1.3521, lng: 103.8198 }} locations={locations} />
+        <Map center={location ?? { lat: 1.3521, lng: 103.8198 }} locations={locations} currentLocation={location || undefined} />
       </div>
+
     </>
   );
 }

@@ -29,6 +29,7 @@ type MapLocation = LatLngLiteral & { id: string, carparkData: CarparkData };
 type MapProps = {
   center: LatLngLiteral;
   locations: MapLocation[];
+  currentLocation?: LatLngLiteral;
 };
 
 const SelectedLocation = ({ center }: { center: LatLngLiteral }) => {
@@ -37,7 +38,7 @@ const SelectedLocation = ({ center }: { center: LatLngLiteral }) => {
   return null;
 };
 
-export const Map: React.FC<MapProps> = memo(({ center, locations }) => {
+export const Map: React.FC<MapProps> = memo(({ center, locations, currentLocation }) => {
   const [mapType, setMapType] = useState<MapType>("roadmap");
   const [selectedLocation, setSelectedLocation] = useState<
     MapLocation | undefined
@@ -109,7 +110,7 @@ export const Map: React.FC<MapProps> = memo(({ center, locations }) => {
         <MapContainer
           center={center}
           zoom={13}
-          minZoom={5}
+          minZoom={15}
           zoomControl={false}
           attributionControl={false}
           style={{ width: "100%", height: "100%" }}
@@ -117,6 +118,11 @@ export const Map: React.FC<MapProps> = memo(({ center, locations }) => {
           <TileLayer url={getUrl()} />
           {selectedLocation && <SelectedLocation center={selectedLocation} />}
           {renderMarks()}
+          {currentLocation && (
+            <Marker
+              position={{ lat: currentLocation.lat, lng: currentLocation.lng }}
+            />
+          )}
           <ZoomControl position="topright" />
         </MapContainer>
       </div>
