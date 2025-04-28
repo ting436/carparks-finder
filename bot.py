@@ -29,6 +29,17 @@ def send_welcome(message):
                     "Please share your location to obtain the availabilities of the nearest carparks around you.", 
                     reply_markup=markup)
 
+
+@bot.message_handler(commands=['help'])
+def send_help(message):
+    help_text = """
+    /start - Start the bot and get a welcome message.
+    /help - Get information on how to use the bot.
+    📍 Share your location to find nearby carparks.
+    🅿️ Check carpark availability and more.
+    """
+    bot.reply_to(message, help_text)
+
 @bot.message_handler(content_types=['location'])
 def handle_location(message):
     markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)    
@@ -165,6 +176,12 @@ def cleanup_locations():
             print(f"Removed expired location for user {user_id}")
 
         time.sleep(60)
+
+
+bot.set_my_commands([
+    types.BotCommand("start", "🏠 Start the bot and share location"),
+    types.BotCommand("help",  "❓ Show usage instructions"),
+])
 
 cleanup_thread = threading.Thread(target=cleanup_locations, daemon=True)
 cleanup_thread.start()
