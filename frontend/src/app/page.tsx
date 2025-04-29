@@ -113,13 +113,21 @@ export default function Page() {
   }
 
   useEffect(() => {
-    const now = new Date();
-    now.setHours(now.getHours() + 8); // Add 8 hours to convert UTC to SGT
-    const date_time = now.toISOString().slice(0, 19);
-    fetchCarparkData(date_time).then((data: CarparkData[]) => {
-      setCarparkData(data);
-    });
-  });
+    const fetchData = () => {
+      const now = new Date();
+      now.setHours(now.getHours() + 8);
+      const date_time = now.toISOString().slice(0, 19);
+      fetchCarparkData(date_time).then((data: CarparkData[]) => {
+        setCarparkData(data);
+      });
+    };
+  
+    fetchData();
+
+    const interval = setInterval(fetchData, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const memoizedCarparkData = useMemo(() => carparkData, [carparkData]);
 
