@@ -64,7 +64,7 @@ export const Map: React.FC<MapProps> = memo(({ center, locations, currentLocatio
   });
 
   const renderMarks = () => {
-    return locations.map((location) => (
+    return locations.filter((location) => location.carparkData?.carpark_number).map((location) => (
       
       <div key={location.id}>
         <Marker
@@ -76,7 +76,9 @@ export const Map: React.FC<MapProps> = memo(({ center, locations, currentLocatio
           position={{ lat: location.lat, lng: location.lng }}
           eventHandlers={{
             click: () => {
-              setSelectedLocation(location);
+              setSelectedLocation((prev) =>
+                prev?.id === location.id ? undefined : location
+              );
             },
           }}
         >
